@@ -6,7 +6,7 @@ import { Toaster } from 'sonner'
 
 import { useAuth } from '@/contexts/AuthContext'
 
-import Sidebar from './Sidebar/Sidebar'
+import { Sidebar } from './Sidebar/Sidebar'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
