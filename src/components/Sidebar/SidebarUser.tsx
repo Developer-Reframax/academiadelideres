@@ -2,15 +2,11 @@
 
 import { User } from 'lucide-react'
 
-interface SidebarUserProps {
-  user: {
-    nome: string
-    role: string
-  }
-  isCollapsed: boolean
-}
+import { useSidebar } from '../../contexts/SidebarContext'
 
-export function SidebarUser({ user, isCollapsed }: SidebarUserProps) {
+export function SidebarUser() {
+  const { user, isCollapsed } = useSidebar()
+
   if (isCollapsed) return null
 
   return (

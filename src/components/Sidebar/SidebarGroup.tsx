@@ -3,19 +3,18 @@
 import { ChevronDown, ChevronRight, LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 
+import { useSidebar } from '../../contexts/SidebarContext'
 import { SidebarItem } from './SidebarItem'
 
-interface SidebarGroupProps {
-  item: {
-    label: string
-    icon: LucideIcon
-    children: { href: string; label: string; icon: LucideIcon }[]
-  }
-  isCollapsed: boolean
+interface SidebarGroupItem {
+  label: string
+  icon: LucideIcon
+  children: { href: string; label: string; icon: LucideIcon }[]
 }
 
-export function SidebarGroup({ item, isCollapsed }: SidebarGroupProps) {
+export function SidebarGroup({ item }: { item: SidebarGroupItem }) {
   const [open, setOpen] = useState(false)
+  const { isCollapsed } = useSidebar()
 
   return (
     <div>
@@ -47,7 +46,6 @@ export function SidebarGroup({ item, isCollapsed }: SidebarGroupProps) {
               href={child.href}
               label={child.label}
               icon={child.icon}
-              isCollapsed={false}
             />
           ))}
         </div>

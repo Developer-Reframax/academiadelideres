@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { Toaster } from 'sonner'
 
 import { useAuth } from '@/contexts/AuthContext'
+import { SidebarProvider } from '@/contexts/SidebarContext'
 
 import { Sidebar } from './Sidebar/Sidebar'
 
@@ -39,14 +40,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <>
-      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Sidebar user={user} />
+    <SidebarProvider user={user}>
+      <div className="flex bg-gray-50 dark:bg-gray-900">
+        <Sidebar />
         <main className="flex-1 overflow-auto">
           <div className="p-6">{children}</div>
         </main>
+        <Toaster position="top-right" richColors closeButton />
       </div>
-      <Toaster position="top-right" richColors closeButton />
-    </>
+    </SidebarProvider>
   )
 }

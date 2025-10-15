@@ -7,13 +7,11 @@ import { useTheme } from 'next-themes'
 import logoDark from '@/assets/logoAcadLiderDarkMode.svg'
 import logoLight from '@/assets/logoAcadLideres.svg'
 
-interface SidebarHeaderProps {
-  isCollapsed: boolean
-  onToggle: () => void
-}
+import { useSidebar } from '../../contexts/SidebarContext'
 
-export function SidebarHeader({ isCollapsed, onToggle }: SidebarHeaderProps) {
-  const { theme } = useTheme() // 'light' | 'dark' | 'system'
+export function SidebarHeader() {
+  const { isCollapsed, toggleSidebar } = useSidebar()
+  const { theme } = useTheme()
 
   const currentLogo = theme === 'dark' ? logoDark : logoLight
   return (
@@ -23,7 +21,7 @@ export function SidebarHeader({ isCollapsed, onToggle }: SidebarHeaderProps) {
       )}
 
       <button
-        onClick={onToggle}
+        onClick={toggleSidebar}
         className="absolute right-4 rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         {isCollapsed ? (

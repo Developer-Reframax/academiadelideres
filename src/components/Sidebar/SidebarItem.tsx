@@ -3,12 +3,13 @@
 import { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 
+import { useSidebar } from '../../contexts/SidebarContext'
+
 interface SidebarItemProps {
   href: string
   label: string
   icon: LucideIcon
   active?: boolean
-  isCollapsed: boolean
 }
 
 export function SidebarItem({
@@ -16,8 +17,9 @@ export function SidebarItem({
   label,
   icon: Icon,
   active,
-  isCollapsed,
 }: SidebarItemProps) {
+  const { isCollapsed } = useSidebar()
+
   return (
     <Link
       href={href}

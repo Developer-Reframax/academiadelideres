@@ -10,15 +10,12 @@ import {
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
+import { useSidebar } from '../../contexts/SidebarContext'
 import { SidebarGroup } from './SidebarGroup'
 import { SidebarItem } from './SidebarItem'
 
-interface SidebarMenuProps {
-  userRole: string
-  isCollapsed: boolean
-}
-
-export function SidebarMenu({ userRole, isCollapsed }: SidebarMenuProps) {
+export function SidebarMenu() {
+  const { user } = useSidebar()
   const pathname = usePathname()
 
   const menu = [
@@ -40,12 +37,10 @@ export function SidebarMenu({ userRole, isCollapsed }: SidebarMenuProps) {
   return (
     <nav className="flex-1 space-y-2 p-3">
       {menu.map((item, index) => {
-        if (item.adminOnly && userRole !== 'admin') return null
+        if (item.adminOnly && user.role !== 'admin') return null
 
         if (item.children) {
-          return (
-            <SidebarGroup key={index} item={item} isCollapsed={isCollapsed} />
-          )
+          return <SidebarGroup key={index} item={item} />
         }
 
         return (
@@ -55,7 +50,6 @@ export function SidebarMenu({ userRole, isCollapsed }: SidebarMenuProps) {
             icon={item.icon}
             label={item.label}
             active={pathname === item.href}
-            isCollapsed={isCollapsed}
           />
         )
       })}

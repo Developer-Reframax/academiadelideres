@@ -5,8 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 
-export function SidebarFooter({ isCollapsed }: { isCollapsed: boolean }) {
+import { useSidebar } from '../../contexts/SidebarContext'
+
+export function SidebarFooter() {
   const { theme, setTheme } = useTheme()
+  const { isCollapsed } = useSidebar()
   const router = useRouter()
 
   const handleLogout = async () => {
