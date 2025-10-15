@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 
+import { LayoutWrapper } from '@/components/layouts/LayoutWrapper'
 import { AuthProvider } from '@/contexts/AuthContext'
 
 const montserrat = Montserrat({
@@ -31,7 +32,7 @@ export default function RootLayout({
             enableSystem={true} // respeita o tema do sistema se quiser
             storageKey="theme" // chave no localStorage
           >
-            {children}
+            <LayoutWrapper>{children}</LayoutWrapper>
           </ThemeProvider>
         </AuthProvider>
       </body>

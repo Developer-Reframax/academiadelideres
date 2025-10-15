@@ -103,7 +103,7 @@ export default function LoginPage() {
                   value={telefone}
                   onChange={handlePhoneChange}
                   placeholder="+55 (11) 99999-9999"
-                  className="block w-full rounded-lg border border-gray-300 py-3 pl-10 pr-3 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
+                  className="block w-full rounded-lg border border-gray-300 py-3 pl-10 pr-3 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:bg-foreground dark:text-background focus:dark:bg-foreground"
                   required
                 />
               </div>
@@ -127,7 +127,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Digite sua senha"
-                  className="block w-full rounded-lg border border-gray-300 py-3 pl-10 pr-12 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
+                  className="block w-full rounded-lg border border-gray-300 py-3 pl-10 pr-3 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:bg-foreground dark:text-background focus:dark:bg-foreground"
                   required
                 />
                 <button

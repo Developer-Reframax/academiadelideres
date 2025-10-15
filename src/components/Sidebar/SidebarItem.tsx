@@ -27,7 +27,7 @@ export function SidebarItem({
         active
           ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
           : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-      }`}
+      } `}
       title={isCollapsed ? label : undefined}
     >
       <Icon className="h-5 w-5 flex-shrink-0" />
