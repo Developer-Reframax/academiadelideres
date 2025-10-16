@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, Edit, Eye, Trash2 } from 'lucide-react'
+import { CircleCheck, Edit, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -68,7 +68,7 @@ export function UsuariosTable({
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-100 dark:bg-gray-700">
+            <TableRow className="bg-gray-100 dark:bg-gray-900">
               {[
                 'Usuário',
                 'Matrícula',
@@ -112,7 +112,12 @@ export function UsuariosTable({
                 </TableCell>
 
                 <TableCell className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                  {usuario.telefone}
+                  {usuario.telefone
+                    ? usuario.telefone.replace(
+                        /^(\d{2})(\d{5})(\d{4})$/,
+                        '($1) $2-$3',
+                      )
+                    : ''}
                 </TableCell>
 
                 <TableCell className="px-6 py-4 text-sm text-gray-900 dark:text-white">
@@ -138,17 +143,6 @@ export function UsuariosTable({
                 <TableCell className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end space-x-2">
                     <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                            <Eye className="h-4 w-4" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Visualizar</p>
-                        </TooltipContent>
-                      </Tooltip>
-
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">
@@ -178,7 +172,7 @@ export function UsuariosTable({
                             {usuario.status === 'ativo' ? (
                               <Trash2 className="h-4 w-4" />
                             ) : (
-                              <Check className="h-4 w-4" />
+                              <CircleCheck className="h-4 w-4" />
                             )}
                           </button>
                         </TooltipTrigger>

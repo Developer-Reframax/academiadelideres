@@ -8,6 +8,7 @@ import { DefaultHeader } from '@/components/DefaultHeader/DefaultHeader'
 import { Button } from '@/components/ui/button'
 import { Contrato, Grupo, Usuario } from '@/types'
 
+import { AddUserModal } from './_components/AddUserModal'
 import { Filters } from './_components/Filters'
 import { StatsCards } from './_components/StatsCards'
 import { UsuariosTable } from './_components/UsuariosTable'
@@ -20,6 +21,7 @@ export default function UsuariosPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedContrato, setSelectedContrato] = useState<string>('')
   const [selectedGrupo, setSelectedGrupo] = useState<string>('')
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     fetchUsuarios()
@@ -158,14 +160,17 @@ export default function UsuariosPage() {
         subtitle="Gerencie os usuários do sistema"
         action={
           <Button
-            onClick={() => console.log('Adicionar User')}
+            onClick={() => setOpen(true)}
             variant={'outline'}
-            className="rounded-lg bg-primary-500 text-white transition-colors hover:bg-primary-700"
+            className="rounded-lg bg-primary-500 text-white transition-colors hover:bg-primary-700 hover:text-white"
           >
             <Plus size={16} /> Adicionar Usuário
           </Button>
         }
       />
+
+      <AddUserModal open={open} onOpenChange={setOpen} />
+
       <Filters
         searchTerm={searchTerm}
         selectedGrupo={selectedGrupo}
