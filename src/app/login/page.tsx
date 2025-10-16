@@ -34,7 +34,7 @@ export default function LoginPage() {
 
         // Redirecionamento manual após login bem-sucedido
         console.log('🔄 [FRONTEND] Redirecionando para dashboard...')
-        router.push('/dashboard')
+        router.push('/user/dashboard')
       } else {
         console.log('❌ [FRONTEND] Login falhou:', result.message)
         toast.error(result.message || 'Erro ao fazer login')
@@ -47,25 +47,20 @@ export default function LoginPage() {
     }
   }
 
-  const formatPhone = (value: string) => {
-    // Remove tudo que não é número
+  const formatPhoneDisplay = (value: string) => {
+    if (!value) return '' // Campo vazio mostra placeholder
+
     const numbers = value.replace(/\D/g, '')
 
-    // Aplica a máscara +55 (XX) 9XXXX-XXXX
-    if (numbers.length <= 2) {
-      return `+55 ${numbers}`
-    } else if (numbers.length <= 4) {
-      return `+55 (${numbers.slice(2)})`
-    } else if (numbers.length <= 9) {
-      return `+55 (${numbers.slice(2, 4)}) ${numbers.slice(4)}`
-    } else {
-      return `+55 (${numbers.slice(2, 4)}) ${numbers.slice(4, 9)}-${numbers.slice(9, 13)}`
-    }
+    if (numbers.length <= 2) return `(${numbers}`
+    if (numbers.length <= 7)
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
   }
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhone(e.target.value)
-    setTelefone(formatted)
+    const numbers = e.target.value.replace(/\D/g, '') // Apenas números
+    setTelefone(numbers) // Guardamos DDD + número sem máscara
   }
 
   return (
@@ -100,9 +95,9 @@ export default function LoginPage() {
                 <input
                   id="telefone"
                   type="tel"
-                  value={telefone}
+                  value={formatPhoneDisplay(telefone)}
                   onChange={handlePhoneChange}
-                  placeholder="+55 (11) 99999-9999"
+                  placeholder="(11) 99999-9999"
                   className="block w-full rounded-lg border border-gray-300 py-3 pl-10 pr-3 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:bg-foreground dark:text-background focus:dark:bg-foreground"
                   required
                 />

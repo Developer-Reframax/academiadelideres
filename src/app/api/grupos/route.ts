@@ -7,39 +7,24 @@ import { CreateGrupoData } from '@/types'
 // GET - Listar grupos
 export async function GET(request: NextRequest) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
-    if (!token) {
-      token = request.cookies.get('auth-token')?.value || null
-    }
-
-    if (!token) {
+    if (!token) token = request.cookies.get('auth-token')?.value || null
+    if (!token)
       return NextResponse.json(
         { success: false, message: 'Token não fornecido' },
         { status: 401 },
       )
-    }
 
     const payload = verifyToken(token)
-    if (!payload) {
+    if (!payload)
       return NextResponse.json(
         { success: false, message: 'Token inválido' },
         { status: 401 },
       )
-    }
 
-    // Buscar grupos com contagem de usuários
     const { data: grupos, error } = await supabaseAdmin
       .from('grupos')
-      .select(
-        `
-        id,
-        grupo,
-        desafiado,
-        created_at,
-        updated_at
-      `,
-      )
+      .select('id, grupo, desafiado, created_at, updated_at')
       .order('grupo')
 
     if (error) {
@@ -50,15 +35,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Formatar dados para incluir contagem de usuários
-    const gruposFormatados = grupos.map((grupo) => ({
-      ...grupo,
-    }))
-
-    return NextResponse.json({
-      success: true,
-      data: gruposFormatados,
-    })
+    return NextResponse.json({ success: true, data: grupos })
   } catch (error) {
     console.error('Erro na API de grupos:', error)
     return NextResponse.json(
@@ -71,45 +48,35 @@ export async function GET(request: NextRequest) {
 // POST - Criar grupo (apenas admins)
 export async function POST(request: NextRequest) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
-    if (!token) {
-      token = request.cookies.get('auth-token')?.value || null
-    }
-
-    if (!token) {
+    if (!token) token = request.cookies.get('auth-token')?.value || null
+    if (!token)
       return NextResponse.json(
         { success: false, message: 'Token não fornecido' },
         { status: 401 },
       )
-    }
 
     const payload = verifyToken(token)
-    if (!payload || payload.role !== 'admin') {
+    if (!payload || payload.role !== 'admin')
       return NextResponse.json(
         { success: false, message: 'Acesso negado' },
         { status: 403 },
       )
-    }
 
     const body: CreateGrupoData = await request.json()
-    const { nome, descricao } = body
+    const { grupo, desafiado } = body
 
-    // Validar dados obrigatórios
-    if (!nome) {
+    if (!grupo)
       return NextResponse.json(
         { success: false, message: 'Nome do grupo é obrigatório' },
         { status: 400 },
       )
-    }
 
-    // Criar grupo
-    const { data: grupo, error } = await supabaseAdmin
+    const { data: novoGrupo, error } = await supabaseAdmin
       .from('grupos')
       .insert({
-        nome,
-        descricao,
-        status: 'ativo',
+        grupo,
+        desafiado: desafiado ?? false,
       })
       .select()
       .single()
@@ -124,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: grupo,
+      data: novoGrupo,
       message: 'Grupo criado com sucesso',
     })
   } catch (error) {

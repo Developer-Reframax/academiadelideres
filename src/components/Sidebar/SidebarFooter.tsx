@@ -64,11 +64,7 @@ export function SidebarFooter() {
             : undefined
         }
       >
-        {theme === 'light' ? (
-          <Moon className="h-5 w-5" />
-        ) : (
-          <Sun className="h-5 w-5" />
-        )}
+        {theme === 'light' ? <Moon /> : <Sun />}
         {!isCollapsed && (
           <span className="text-sm font-medium">
             {theme === 'light' ? 'Modo Escuro' : 'Modo Claro'}

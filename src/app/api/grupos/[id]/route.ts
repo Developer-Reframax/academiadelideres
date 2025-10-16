@@ -9,50 +9,26 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
-    if (!token) {
-      token = request.cookies.get('auth-token')?.value || null
-    }
-
-    if (!token) {
+    if (!token) token = request.cookies.get('auth-token')?.value || null
+    if (!token)
       return NextResponse.json(
         { success: false, message: 'Token não fornecido' },
         { status: 401 },
       )
-    }
 
     const payload = verifyToken(token)
-    if (!payload) {
+    if (!payload)
       return NextResponse.json(
         { success: false, message: 'Token inválido' },
         { status: 401 },
       )
-    }
 
     const id = parseInt(params.id)
 
-    // Buscar grupo com usuários
     const { data: grupo, error } = await supabaseAdmin
       .from('grupos')
-      .select(
-        `
-        id,
-        nome,
-        descricao,
-        status,
-        created_at,
-        updated_at,
-        usuarios (
-          matricula,
-          nome,
-          email,
-          telefone,
-          role,
-          status
-        )
-      `,
-      )
+      .select('id, grupo, desafiado, created_at, updated_at')
       .eq('id', id)
       .single()
 
@@ -63,10 +39,7 @@ export async function GET(
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      data: grupo,
-    })
+    return NextResponse.json({ success: true, data: grupo })
   } catch (error) {
     console.error('Erro ao buscar grupo:', error)
     return NextResponse.json(
@@ -82,41 +55,29 @@ export async function PUT(
   { params }: { params: { id: string } },
 ) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
-    if (!token) {
-      token = request.cookies.get('auth-token')?.value || null
-    }
-
-    if (!token) {
+    if (!token) token = request.cookies.get('auth-token')?.value || null
+    if (!token)
       return NextResponse.json(
         { success: false, message: 'Token não fornecido' },
         { status: 401 },
       )
-    }
 
     const payload = verifyToken(token)
-    if (!payload || payload.role !== 'admin') {
+    if (!payload || payload.role !== 'admin')
       return NextResponse.json(
         { success: false, message: 'Acesso negado' },
         { status: 403 },
       )
-    }
 
     const id = parseInt(params.id)
     const body = await request.json()
-
-    // Preparar dados para atualização
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateData: any = {
-      updated_at: new Date().toISOString(),
-    }
+    const updateData: any = { updated_at: new Date().toISOString() }
 
-    if (body.nome) updateData.nome = body.nome
-    if (body.descricao !== undefined) updateData.descricao = body.descricao
-    if (body.status) updateData.status = body.status
+    if (body.grupo) updateData.grupo = body.grupo
+    if (body.desafiado !== undefined) updateData.desafiado = body.desafiado
 
-    // Atualizar grupo
     const { data: grupo, error } = await supabaseAdmin
       .from('grupos')
       .update(updateData)
@@ -146,41 +107,34 @@ export async function PUT(
   }
 }
 
-// DELETE - Desativar grupo (apenas admins)
+// DELETE - Excluir grupo (apenas admins)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
-    if (!token) {
-      token = request.cookies.get('auth-token')?.value || null
-    }
-
-    if (!token) {
+    if (!token) token = request.cookies.get('auth-token')?.value || null
+    if (!token)
       return NextResponse.json(
         { success: false, message: 'Token não fornecido' },
         { status: 401 },
       )
-    }
 
     const payload = verifyToken(token)
-    if (!payload || payload.role !== 'admin') {
+    if (!payload || payload.role !== 'admin')
       return NextResponse.json(
         { success: false, message: 'Acesso negado' },
         { status: 403 },
       )
-    }
 
     const id = parseInt(params.id)
 
-    // Verificar se há usuários no grupo
+    // Verificar se há usuários associados
     const { data: usuarios, error: usuariosError } = await supabaseAdmin
       .from('usuarios')
       .select('matricula')
-      .eq('grupo_id', id)
-      .eq('status', 'ativo')
+      .eq('id_grupo', id)
 
     if (usuariosError) {
       console.error('Erro ao verificar usuários do grupo:', usuariosError)
@@ -194,35 +148,29 @@ export async function DELETE(
       return NextResponse.json(
         {
           success: false,
-          message: 'Não é possível desativar grupo com usuários ativos',
+          message: 'Não é possível excluir grupo com usuários associados',
         },
         { status: 400 },
       )
     }
 
-    // Desativar grupo (soft delete)
-    const { error } = await supabaseAdmin
-      .from('grupos')
-      .update({
-        status: 'inativo',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
+    // Excluir grupo
+    const { error } = await supabaseAdmin.from('grupos').delete().eq('id', id)
 
     if (error) {
-      console.error('Erro ao desativar grupo:', error)
+      console.error('Erro ao excluir grupo:', error)
       return NextResponse.json(
-        { success: false, message: 'Erro ao desativar grupo' },
+        { success: false, message: 'Erro ao excluir grupo' },
         { status: 500 },
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Grupo desativado com sucesso',
+      message: 'Grupo excluído com sucesso',
     })
   } catch (error) {
-    console.error('Erro na desativação de grupo:', error)
+    console.error('Erro na exclusão de grupo:', error)
     return NextResponse.json(
       { success: false, message: 'Erro interno do servidor' },
       { status: 500 },

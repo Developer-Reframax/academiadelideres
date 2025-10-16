@@ -5,8 +5,6 @@ import {
   ClipboardCheckIcon,
   LayoutDashboard,
   Network,
-  Settings,
-  User,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
@@ -16,17 +14,22 @@ export function SidebarMenu() {
   const pathname = usePathname()
 
   const menu = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/desafios', label: 'Meus Desafios', icon: ClipboardCheckIcon },
-    { href: '/riscos-criticos', label: 'Riscos Críticos', icon: BadgeAlert },
+    { href: '/user/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     {
-      href: '/analise-abrangencia',
+      href: '/user/desafios',
+      label: 'Meus Desafios',
+      icon: ClipboardCheckIcon,
+    },
+    {
+      href: '/user/riscos-criticos',
+      label: 'Riscos Críticos',
+      icon: BadgeAlert,
+    },
+    {
+      href: '/user/abrangencia-acidentes',
       label: 'Abrangência de Acidentes',
       icon: Network,
     },
-
-    { href: '/perfil', icon: User, label: 'Perfil' },
-    { href: '/configuracoes', icon: Settings, label: 'Configurações' },
   ]
 
   return (

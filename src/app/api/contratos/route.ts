@@ -10,46 +10,25 @@ export async function GET(request: NextRequest) {
   try {
     // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
-    if (!token) {
-      token = request.cookies.get('auth-token')?.value || null
-    }
-
-    if (!token) {
+    if (!token) token = request.cookies.get('auth-token')?.value || null
+    if (!token)
       return NextResponse.json(
         { success: false, message: 'Token não fornecido' },
         { status: 401 },
       )
-    }
 
     const payload = verifyToken(token)
-    if (!payload) {
+    if (!payload)
       return NextResponse.json(
         { success: false, message: 'Token inválido' },
         { status: 401 },
       )
-    }
 
-    // Buscar contratos com informações do grupo
+    // Buscar contratos
     const { data: contratos, error } = await supabaseAdmin
       .from('contratos')
       .select(
-        `
-        id,
-        numero,
-        nome,
-        descricao,
-        valor,
-        data_inicio,
-        data_fim,
-        status,
-        grupo_id,
-        created_at,
-        updated_at,
-        grupos:grupo_id (
-          id,
-          nome
-        )
-      `,
+        'id, codigo, descricao, gerente_geral, gerente_operacoes, coordenador, created_at, updated_at',
       )
       .order('created_at', { ascending: false })
 
@@ -61,10 +40,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      data: contratos,
-    })
+    return NextResponse.json({ success: true, data: contratos })
   } catch (error) {
     console.error('Erro na API de contratos:', error)
     return NextResponse.json(
@@ -79,47 +55,28 @@ export async function POST(request: NextRequest) {
   try {
     // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
-    if (!token) {
-      token = request.cookies.get('auth-token')?.value || null
-    }
-
-    if (!token) {
+    if (!token) token = request.cookies.get('auth-token')?.value || null
+    if (!token)
       return NextResponse.json(
         { success: false, message: 'Token não fornecido' },
         { status: 401 },
       )
-    }
 
     const payload = verifyToken(token)
-    if (!payload || payload.role !== 'admin') {
+    if (!payload || payload.role !== 'admin')
       return NextResponse.json(
         { success: false, message: 'Acesso negado' },
         { status: 403 },
       )
-    }
 
     const body: CreateContratoData = await request.json()
-    const { numero, nome, descricao, valor, data_inicio, data_fim, grupo_id } =
+    const { codigo, descricao, gerente_geral, gerente_operacoes, coordenador } =
       body
 
     // Validar dados obrigatórios
-    if (!numero || !nome || !valor || !data_inicio || !data_fim) {
+    if (!codigo || !descricao) {
       return NextResponse.json(
-        { success: false, message: 'Dados obrigatórios não fornecidos' },
-        { status: 400 },
-      )
-    }
-
-    // Validar datas
-    const dataInicio = new Date(data_inicio)
-    const dataFim = new Date(data_fim)
-
-    if (dataFim <= dataInicio) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Data de fim deve ser posterior à data de início',
-        },
+        { success: false, message: 'Campos obrigatórios não fornecidos' },
         { status: 400 },
       )
     }
@@ -128,14 +85,11 @@ export async function POST(request: NextRequest) {
     const { data: contrato, error } = await supabaseAdmin
       .from('contratos')
       .insert({
-        numero,
-        nome,
+        codigo,
         descricao,
-        valor,
-        data_inicio,
-        data_fim,
-        grupo_id,
-        status: 'ativo',
+        gerente_geral,
+        gerente_operacoes,
+        coordenador,
       })
       .select()
       .single()

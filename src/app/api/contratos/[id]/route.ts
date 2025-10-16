@@ -9,7 +9,6 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
     if (!token) {
       token = request.cookies.get('auth-token')?.value || null
@@ -32,28 +31,10 @@ export async function GET(
 
     const id = parseInt(params.id)
 
-    // Buscar contrato com informações do grupo
     const { data: contrato, error } = await supabaseAdmin
       .from('contratos')
       .select(
-        `
-        id,
-        numero,
-        nome,
-        descricao,
-        valor,
-        data_inicio,
-        data_fim,
-        status,
-        grupo_id,
-        created_at,
-        updated_at,
-        grupos:grupo_id (
-          id,
-          nome,
-          descricao
-        )
-      `,
+        'id, codigo, descricao, gerente_geral, gerente_operacoes, coordenador, created_at, updated_at',
       )
       .eq('id', id)
       .single()
@@ -65,10 +46,7 @@ export async function GET(
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      data: contrato,
-    })
+    return NextResponse.json({ success: true, data: contrato })
   } catch (error) {
     console.error('Erro ao buscar contrato:', error)
     return NextResponse.json(
@@ -84,7 +62,6 @@ export async function PUT(
   { params }: { params: { id: string } },
 ) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
     if (!token) {
       token = request.cookies.get('auth-token')?.value || null
@@ -108,38 +85,26 @@ export async function PUT(
     const id = parseInt(params.id)
     const body = await request.json()
 
-    // Preparar dados para atualização
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateData: any = {
+    const updateData: Partial<{
+      codigo: string
+      descricao: string
+      gerente_geral: number
+      gerente_operacoes: number
+      coordenador: number
+      updated_at: string
+    }> = {
       updated_at: new Date().toISOString(),
     }
 
-    if (body.numero) updateData.numero = body.numero
-    if (body.nome) updateData.nome = body.nome
+    if (body.codigo !== undefined) updateData.codigo = body.codigo
     if (body.descricao !== undefined) updateData.descricao = body.descricao
-    if (body.valor) updateData.valor = body.valor
-    if (body.data_inicio) updateData.data_inicio = body.data_inicio
-    if (body.data_fim) updateData.data_fim = body.data_fim
-    if (body.grupo_id !== undefined) updateData.grupo_id = body.grupo_id
-    if (body.status) updateData.status = body.status
+    if (body.gerente_geral !== undefined)
+      updateData.gerente_geral = body.gerente_geral
+    if (body.gerente_operacoes !== undefined)
+      updateData.gerente_operacoes = body.gerente_operacoes
+    if (body.coordenador !== undefined)
+      updateData.coordenador = body.coordenador
 
-    // Validar datas se fornecidas
-    if (body.data_inicio && body.data_fim) {
-      const dataInicio = new Date(body.data_inicio)
-      const dataFim = new Date(body.data_fim)
-
-      if (dataFim <= dataInicio) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: 'Data de fim deve ser posterior à data de início',
-          },
-          { status: 400 },
-        )
-      }
-    }
-
-    // Atualizar contrato
     const { data: contrato, error } = await supabaseAdmin
       .from('contratos')
       .update(updateData)
@@ -169,13 +134,12 @@ export async function PUT(
   }
 }
 
-// DELETE - Desativar contrato (apenas admins)
+// DELETE - Desativar contrato (soft delete não existe, então apenas retornamos erro se houver FK)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
-    // Verificar autenticação
     let token = extractTokenFromHeader(request.headers.get('authorization'))
     if (!token) {
       token = request.cookies.get('auth-token')?.value || null
@@ -198,29 +162,30 @@ export async function DELETE(
 
     const id = parseInt(params.id)
 
-    // Desativar contrato (soft delete)
+    // Tentar deletar, mas cuidado com FK na tabela usuarios
     const { error } = await supabaseAdmin
       .from('contratos')
-      .update({
-        status: 'inativo',
-        updated_at: new Date().toISOString(),
-      })
+      .delete()
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao desativar contrato:', error)
+      console.error('Erro ao deletar contrato:', error)
       return NextResponse.json(
-        { success: false, message: 'Erro ao desativar contrato' },
-        { status: 500 },
+        {
+          success: false,
+          message:
+            'Não foi possível deletar o contrato. Verifique se há usuários vinculados.',
+        },
+        { status: 400 },
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Contrato desativado com sucesso',
+      message: 'Contrato deletado com sucesso',
     })
   } catch (error) {
-    console.error('Erro na desativação de contrato:', error)
+    console.error('Erro na exclusão de contrato:', error)
     return NextResponse.json(
       { success: false, message: 'Erro interno do servidor' },
       { status: 500 },

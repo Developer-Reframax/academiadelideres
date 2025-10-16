@@ -51,13 +51,23 @@ export async function GET(
         email,
         telefone,
         role,
+        contrato_id,
         grupo_id,
         status,
         created_at,
         updated_at,
+        contratos:contrato_id (
+          id,
+          codigo,
+          descricao,
+          gerente_geral,
+          gerente_operacoes,
+          coordenador
+        ),
         grupos:grupo_id (
           id,
-          nome
+          grupo,
+          desafiado
         )
       `,
       )
@@ -210,17 +220,6 @@ export async function DELETE(
     }
 
     const matricula = parseInt(params.matricula)
-
-    // Não permitir que admin delete a si mesmo
-    if (payload.matricula === matricula) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Não é possível desativar sua própria conta',
-        },
-        { status: 400 },
-      )
-    }
 
     // Desativar usuário (soft delete)
     const { error } = await supabaseAdmin

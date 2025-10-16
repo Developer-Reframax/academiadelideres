@@ -4,7 +4,6 @@ import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 
-import { LayoutWrapper } from '@/components/layouts/LayoutWrapper'
 import { AuthProvider } from '@/contexts/AuthContext'
 
 const montserrat = Montserrat({
@@ -24,7 +23,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className={montserrat.variable}>
-      <body className={`${montserrat.className} antialiased`}>
+      <body
+        className={`${montserrat.className} --webkit-font-smoothing antialiased`}
+      >
         <AuthProvider>
           <ThemeProvider
             attribute="class"
@@ -32,7 +33,7 @@ export default function RootLayout({
             enableSystem={true} // respeita o tema do sistema se quiser
             storageKey="theme" // chave no localStorage
           >
-            <LayoutWrapper>{children}</LayoutWrapper>
+            {children}
           </ThemeProvider>
         </AuthProvider>
       </body>

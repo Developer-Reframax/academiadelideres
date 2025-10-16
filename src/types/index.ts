@@ -8,6 +8,17 @@ export interface Grupo {
   updated_at: string
 }
 
+export interface Contrato {
+  id: number
+  codigo: string
+  descricao: string
+  gerente_geral?: number
+  gerente_operacoes?: number
+  coordenador?: number
+  created_at: string
+  updated_at: string
+}
+
 export interface Usuario {
   matricula: number
   nome: string
@@ -16,6 +27,7 @@ export interface Usuario {
   role: 'admin' | 'membro' | 'usuario'
   status: 'ativo' | 'inativo'
   contrato_id?: number
+  contratos?: Contrato
   grupo_id?: number
   grupos?: Grupo
   password_hash: string
@@ -26,17 +38,6 @@ export interface Usuario {
   assinatura_digital?: string
   funcao?: string
   foto?: string
-  created_at: string
-  updated_at: string
-}
-
-export interface Contrato {
-  id: number
-  codigo: string
-  descricao: string
-  gerente_geral?: number
-  gerente_operacoes?: number
-  coordenador?: number
   created_at: string
   updated_at: string
 }

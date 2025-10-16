@@ -32,16 +32,17 @@ const publicRoutes = ['/login']
 
 // Rotas que precisam de autenticação
 const protectedRoutes = [
-  '/dashboard',
-  '/usuarios',
-  '/grupos',
-  '/contratos',
-  '/perfil',
-  '/configuracoes',
+  '/user/dashboard',
+  '/user/desafios',
+  '/user/riscos-criticos',
+  '/user/abrangencia-acidentes',
+  '/admin/usuarios',
+  '/admin/grupos',
+  '/admin/contratos',
 ]
 
 // Rotas que só admins podem acessar
-const adminRoutes = ['/usuarios', '/grupos', '/contratos']
+const adminRoutes = ['/admin/usuarios', '/admin/grupos', '/admin/contratos']
 
 /**
  * Middleware para verificar JWT token
@@ -293,7 +294,9 @@ export function middleware(request: NextRequest) {
             console.log(
               '❌ [MIDDLEWARE] Usuário não é admin, redirecionando para dashboard',
             )
-            return NextResponse.redirect(new URL('/dashboard', request.url))
+            return NextResponse.redirect(
+              new URL('/user/dashboard', request.url),
+            )
           }
           console.log('✅ [MIDDLEWARE] Usuário é admin, acesso permitido')
         }
@@ -337,7 +340,7 @@ export function middleware(request: NextRequest) {
   // Redirecionar para dashboard se estiver na raiz
   if (pathname === '/') {
     console.log('🏠 [MIDDLEWARE] Redirecionando raiz para dashboard')
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL('/user/dashboard', request.url))
   }
 
   console.log('🔓 [MIDDLEWARE] Permitindo acesso padrão para:', pathname)

@@ -45,12 +45,22 @@ export async function GET(request: NextRequest) {
         telefone,
         role,
         grupo_id,
+        contrato_id,
         status,
         created_at,
         updated_at,
+        contratos:contrato_id (
+          id,
+          codigo,
+          descricao,
+          gerente_geral,
+          gerente_operacoes,
+          coordenador
+        ),
         grupos:grupo_id (
           id,
-          grupo
+          grupo,
+          desafiado
         )
       `,
       )
@@ -102,7 +112,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CreateUsuarioData = await request.json()
-    const { matricula, nome, email, telefone, role, grupo_id } = body
+    const { matricula, nome, email, telefone, role, grupo_id, contrato_id } =
+      body
 
     // Validar dados obrigatórios
     if (!matricula || !nome || !email || !telefone) {
@@ -126,6 +137,7 @@ export async function POST(request: NextRequest) {
         telefone,
         role: role || 'user',
         grupo_id,
+        contrato_id,
         password_hash: passwordHash,
         status: 'ativo',
       })

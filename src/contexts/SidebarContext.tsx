@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { createContext, ReactNode, useContext, useState } from 'react'
 
 export interface SidebarUser {
   nome: string
@@ -29,38 +23,44 @@ interface SidebarProviderProps {
 }
 
 export function SidebarProvider({ children, user }: SidebarProviderProps) {
-  // Carrega o estado inicial do localStorage (modo admin persistente)
-  const [isAdminMode, setIsAdminMode] = useState(() => {
+  const [isCollapsed, setIsCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('isAdminMode') === 'true'
+      const saved = localStorage.getItem(`isCollapsed_${user.nome}`)
+      return saved === 'true'
     }
     return false
   })
 
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isAdminMode, setIsAdminMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // Garante que apenas usuários admin possam iniciar em modo admin
+      const saved = localStorage.getItem(`isAdminMode_${user.nome}`)
+      return saved === 'true' && user.role === 'admin'
+    }
+    return false
+  })
 
-  const toggleSidebar = () => setIsCollapsed((prev) => !prev)
-
-  const toggleAdminMode = () => {
-    setIsAdminMode((prev) => {
+  const toggleSidebar = () => {
+    setIsCollapsed((prev) => {
       const next = !prev
       if (typeof window !== 'undefined') {
-        localStorage.setItem('isAdminMode', next.toString())
+        localStorage.setItem(`isCollapsed_${user.nome}`, next.toString())
       }
       return next
     })
   }
 
-  // Atualiza localStorage caso o usuário entre de novo e localStorage tenha valor
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('isAdminMode')
-      if (saved !== null) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsAdminMode(saved === 'true')
+  const toggleAdminMode = () => {
+    if (user.role !== 'admin') return // impede usuários normais de alternar
+
+    setIsAdminMode((prev) => {
+      const next = !prev
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`isAdminMode_${user.nome}`, next.toString())
       }
-    }
-  }, [])
+      return next
+    })
+  }
 
   return (
     <SidebarContext.Provider
