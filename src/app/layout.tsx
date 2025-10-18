@@ -2,8 +2,8 @@ import './globals.css'
 
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
 
+import { ThemeProviderWrapper } from '@/components/ThemeProviderWrapper'
 import { AuthProvider } from '@/contexts/AuthContext'
 
 const montserrat = Montserrat({
@@ -27,14 +27,7 @@ export default function RootLayout({
         className={`${montserrat.className} --webkit-font-smoothing antialiased`}
       >
         <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light" // tema padrão
-            enableSystem={true} // respeita o tema do sistema se quiser
-            storageKey="theme" // chave no localStorage
-          >
-            {children}
-          </ThemeProvider>
+          <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
         </AuthProvider>
       </body>
     </html>
